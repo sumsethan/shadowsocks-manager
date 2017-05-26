@@ -493,6 +493,60 @@ exports.getOneUser = (req, res) => {
   });
 };
 
+exports.addUser = (req, res) => {
+  req.checkBody('email', 'Invalid email').notEmpty();
+  req.checkBody('password', 'Invalid password').notEmpty();
+  req.getValidationResult().then(result => {
+    if (result.isEmpty()) {
+      const username = req.body.email;
+      const password = req.body.password;
+      const type = req.body.type;
+      return user.add({
+        username, password,type
+      });
+    }
+    result.throw();
+  }).then(success => {
+    res.send('success');
+  }).catch(err => {
+    console.log(err);
+    res.status(403).end();
+  });
+};
+
+exports.changeUserData = (req, res) => {
+  const userId = req.params.userId;
+  user.edit(userId, {
+    password: req.body.password,
+    type:req.body.type,
+  }).then(success => {
+    res.send('success');
+  }).catch(err => {
+    console.log(err);
+    res.status(403).end();
+  });
+};
+
+exports.deleteUser = (req, res) => {
+  const userId = req.params.userId;
+  user.edit(userId).then(success => {
+    res.send(success);
+  }).catch(err => {
+    console.log(err);
+    res.status(403).end();
+  });
+};
+
+exports.deleteUser = (req, res) => {
+  const userId = req.params.userId;
+  user.del(userId).then(success => {
+    res.send('success');
+  }).catch(err => {
+    console.log(err);
+    res.status(403).end();
+  });
+};
+
 exports.getUserAccount = (req, res) => {
   account.getAccount().then(success => {
     success = success.filter(f => {

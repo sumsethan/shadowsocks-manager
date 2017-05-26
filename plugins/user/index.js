@@ -97,16 +97,21 @@ const checkPassword = async (username, password) => {
   }
 };
 
-const editUser = async (userInfo, edit) => {
+const editUser = async (userId, edit) => {
   try {
-    const username = (await knex('user').select().where(userInfo))[0].username;
+    const username = (await knex('user').select().where({
+      id:userId
+    }))[0].username;
     if(!username) {
       throw new Error('user not found');
     }
     if(edit.password) {
       edit.password = createPassword(edit.password, username);
     }
-    const user = await knex('user').update(edit).where(userInfo);
+    console.log(userId,edit)
+    const user = await knex('user').update(edit).where({
+      id:userId
+    });
     return;
   } catch(err) {
     return Promise.reject(err);
@@ -114,29 +119,24 @@ const editUser = async (userInfo, edit) => {
 };
 
 const getUsers = async () => {
-  const users = await knex('user').select().where({
-    type: 'normal',
-  });
+  const users = await knex('user').select();
   return users;
 };
 
 const getRecentSignUpUsers = async (number) => {
   const users = await knex('user').select().where({
-    type: 'normal',
   }).orderBy('createTime', 'desc').limit(number);
   return users;
 };
 
 const getRecentLoginUsers = async (number) => {
   const users = await knex('user').select().where({
-    type: 'normal',
   }).orderBy('lastLogin', 'desc').limit(number);
   return users;
 };
 
 const getOneUser = async (id) => {
   const user = await knex('user').select().where({
-    type: 'normal',
     id,
   });
   if(!user.length) {
@@ -153,8 +153,8 @@ const getUserAndPaging = async (opt = {}) => {
   const page = opt.page || 1;
   const pageSize = opt.pageSize || 20;
 
-  let count = knex('user').select().where({ type: 'normal' });
-  let users = knex('user').select().where({ type: 'normal' });
+  let count = knex('user').select();
+  let users = knex('user').select();
   if(search) {
     count = count.where('username', 'like', `%${ search }%`);
     users = users.where('username', 'like', `%${ search }%`);
@@ -172,8 +172,18 @@ const getUserAndPaging = async (opt = {}) => {
   };
 };
 
+const delUser = async (id) => {
+  const result = await knex('user').delete().where({ id });
+  if(!result) {
+    return Promise.reject('User id[' + id + '] not found');
+  }
+  return result;
+};
+
+
 exports.add = addUser;
 exports.edit = editUser;
+exports.del = delUser;
 exports.checkPassword = checkPassword;
 exports.get = getUsers;
 exports.getRecentSignUp = getRecentSignUpUsers;
