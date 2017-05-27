@@ -6,6 +6,7 @@ const user = appRequire('plugins/user/index');
 const knex = appRequire('init/knex').knex;
 const moment = require('moment');
 const alipay = appRequire('plugins/alipay/index');
+const home = appRequire('plugins/webgui/server/home');
 
 exports.getServers = (req, res) => {
   serverManager.list().then(success => {
@@ -499,15 +500,23 @@ exports.addUser = (req, res) => {
   req.getValidationResult().then(result => {
     if (result.isEmpty()) {
       const username = req.body.email;
+      const email = req.body.email;
       const password = req.body.password;
       const type = req.body.type;
       return user.add({
-        username, password,type
+        username,email, password,type
       });
     }
     result.throw();
   }).then(success => {
-    res.send('success');
+    if(success[0] > 1) {
+      home.autoAddAccount(success[0])
+        .then(function () {
+          res.send('success');
+        })
+    }else{
+      res.send('success');
+    }
   }).catch(err => {
     console.log(err);
     res.status(403).end();
