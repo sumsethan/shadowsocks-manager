@@ -9,15 +9,24 @@ const createTable = async () => {
   if(config.empty) {
     await knex.schema.dropTableIfExists(tableName);
   }
+  knex.schema.hasColumn(tableName, 'allot')
+    .then((exists) => {
+      if(!exists){
+        return knex.schema.table(tableName, function (table) {
+          table.integer('allot').defaultTo(0);
+        })
+      }
+    });
   await knex.schema.createTableIfNotExists(tableName, function(table) {
     table.increments('id');
     table.string('name');
     table.string('host');
     table.integer('port');
     table.string('password');
-    table.string('method').defaultTo('aes-256-cfb');
+    table.integer('allot').defaultTo(0);
+    table.string('method').defaultTo('chacha20-ietf-poly1305');
   });
-  const list = await knex('server').select(['name', 'host', 'port', 'password']);
+  const list = await knex('server').select(['name', 'host', 'port', 'password', 'allot']);
   if(list.length === 0) {
     const host = config.manager.address.split(':')[0];
     const port = +config.manager.address.split(':')[1];
@@ -40,6 +49,7 @@ const createTable = async () => {
       host,
       port,
       password,
+      allot: 1,
     });
   }
   return;

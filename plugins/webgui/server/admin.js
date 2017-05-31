@@ -70,7 +70,8 @@ exports.addServer = (req, res) => {
     const port = +req.body.port;
     const password = req.body.password;
     const method = req.body.method;
-    return serverManager.add(name, address, port, password, method);
+    const allot = req.body.allot;
+    return serverManager.add(name, address, port, password, method, allot);
   }).then(success => {
     res.send('success');
   }).catch(err => {

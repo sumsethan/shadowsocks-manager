@@ -323,6 +323,7 @@ app.controller('AdminServerController', ['$scope', '$http', '$state', 'moment', 
         port: +$scope.server.port,
         password: $scope.server.password,
         method: $scope.server.method,
+        allot: $scope.server.allot?1:0,
       }, {
         timeout: 15,
       }).then(success => {
@@ -369,6 +370,7 @@ app.controller('AdminServerController', ['$scope', '$http', '$state', 'moment', 
         port: +success.data.port,
         password: success.data.password,
         method: success.data.method,
+        allot: !!success.data.allot,
       };
     });
     $scope.confirm = () => {
@@ -379,6 +381,7 @@ app.controller('AdminServerController', ['$scope', '$http', '$state', 'moment', 
         port: +$scope.server.port,
         password: $scope.server.password,
         method: $scope.server.method,
+        allot: $scope.server.allot?1:0,
       }).then(success => {
         alertDialog.show('修改服务器成功', '确定');
         $state.go('admin.serverPage', { serverId: $stateParams.serverId });

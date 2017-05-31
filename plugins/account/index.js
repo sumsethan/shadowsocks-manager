@@ -10,6 +10,8 @@ const addAccount = async (type, options) => {
   if(type === 6 || type === 7) {
     type = 3;
   }
+  const server_list = await serverManager.list();
+  let server = server_list.filter(s => !!s.allot).map(s => s.id);
   if(type === 1) {
     await knex('account_plugin').insert({
       type,
@@ -18,6 +20,7 @@ const addAccount = async (type, options) => {
       password: options.password,
       status: 0,
       autoRemove: 0,
+      server:JSON.stringify(server),
     });
     await checkAccount.checkServer();
     return;
@@ -34,6 +37,7 @@ const addAccount = async (type, options) => {
       }),
       status: 0,
       autoRemove: options.autoRemove || 0,
+      server:JSON.stringify(server),
     });
     await checkAccount.checkServer();
     return;

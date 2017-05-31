@@ -126,7 +126,7 @@ const checkServer = async () => {
         account.forEach(async a => {
           const accountServer = a.server ? JSON.parse(a.server) : a.server;
           if(accountServer) {
-            newAccountServer = accountServer.filter(f => {
+            let newAccountServer = accountServer.filter(f => {
               return server.filter(sf => sf.id === f)[0];
             });
             if(JSON.stringify(newAccountServer) !== JSON.stringify(accountServer)) {
@@ -141,6 +141,7 @@ const checkServer = async () => {
             port.exist(a.port) && delPort(a, s);
             return;
           }
+
           if(a.type >= 2 && a.type <= 5) {
             let timePeriod = 0;
             if(a.type === 2) { timePeriod = 7 * 86400 * 1000; }
