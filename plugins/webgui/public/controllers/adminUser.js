@@ -106,9 +106,12 @@ app.controller('AdminUserController', ['$scope', '$state', '$stateParams', 'admi
             f.lastConnect = success.lastConnect;
           });
         });
-      }).catch(err => {
+        }).catch(err => {
         $state.go('admin.user');
       });
+    };
+    $scope.editUser = id => {
+      $state.go('admin.editUser', { userId: id });
     };
     getUserData();
     $scope.deleteUserAccount = (accountId) => {
@@ -175,12 +178,15 @@ app.controller('AdminUserController', ['$scope', '$state', '$stateParams', 'admi
   ($scope, $state, $stateParams, $http, alertDialog) => {
     $scope.setTitle('添加用户');
     $scope.setMenuButton('arrow_back', 'admin.user');
-    $scope.user = {};
+    $scope.user = {
+      type:"normal"
+    };
     $scope.confirm = () => {
       alertDialog.loading();
       $http.post('/api/admin/user/add', {
         email: $scope.user.email,
         password: $scope.user.password,
+        type: $scope.user.type,
       }, {
         timeout: 15000,
       }).then(success => {
@@ -194,4 +200,50 @@ app.controller('AdminUserController', ['$scope', '$state', '$stateParams', 'admi
       $state.go('admin.user');
     };
   }
-]);
+]).controller('AdminEditUserController', ['$scope', '$state', '$stateParams', '$http', '$mdBottomSheet', 'confirmDialog', 'alertDialog',
+    ($scope, $state, $stateParams, $http, $mdBottomSheet, confirmDialog, alertDialog) => {
+    $scope.setTitle('编辑用户');
+      $scope.setMenuButton('arrow_back', function () {
+        $state.go('admin.userPage', {userId: $stateParams.userId});
+      });
+      $scope.user = {};
+      const userId = $stateParams.userId;
+      $http.get(`/api/admin/user/${ userId }`)
+        .then(success => {
+          $scope.user.email = success.data.username;
+          $scope.user.type = success.data.type;
+        });
+      $scope.cancel = () => {
+        $state.go('admin.userPage', {userId: $stateParams.userId});
+      };
+      $scope.confirm = () => {
+        alertDialog.loading();
+
+        $http.put(`/api/admin/user/${ userId }/data`, {
+          password: $scope.user.password,
+          type: $scope.user.type
+        }, {
+          timeout: 15000,
+        }).then(success => {
+          alertDialog.show('修改用户成功', '确定');
+          $state.go('admin.userPage', {userId: $stateParams.userId});
+        }).catch(() => {
+          alertDialog.show('修改用户失败', '确定');
+        });
+      };
+
+      $scope.deleteUser = () => {
+        confirmDialog.show({
+          text: '真的要删除用户吗？',
+          cancel: '取消',
+          confirm: '删除',
+          error: '删除用户失败',
+          fn: function () {
+            return $http.delete('/api/admin/user/' + userId);
+          },
+        }).then(() => {
+          $state.go('admin.user');
+        });
+      };
+    }
+  ]);

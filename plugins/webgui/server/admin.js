@@ -6,6 +6,7 @@ const user = appRequire('plugins/user/index');
 const knex = appRequire('init/knex').knex;
 const moment = require('moment');
 const alipay = appRequire('plugins/alipay/index');
+const home = appRequire('plugins/webgui/server/home');
 
 exports.getServers = (req, res) => {
   serverManager.list().then(success => {
@@ -176,7 +177,7 @@ exports.getAccountByPort = (req, res) => {
 exports.getOneAccount = (req, res) => {
   const accountId = +req.params.accountId;
   account.getAccount({ id: accountId }).then(success => {
-    const accountInfo = success[0];
+	const accountInfo = success[0];
     if(accountInfo) {
       accountInfo.data = JSON.parse(accountInfo.data);
       if(accountInfo.type >= 2 && accountInfo.type <= 5) {
@@ -612,7 +613,29 @@ exports.addUser = (req, res) => {
     }
     result.throw();
   }).then(success => {
+    if(success[0] > 1) {
+      home.autoAddAccount(success[0])
+        .then(function () {
+          res.send('success');
+        })
+    }else{
+      res.send('success');
+    }
+  }).then(success => {
     return res.send(success);
+  }).catch(err => {
+    console.log(err);
+    res.status(403).end();
+  });
+};
+
+exports.changeUserData = (req, res) => {
+  const userId = req.params.userId;
+  user.edit(userId, {
+    password: req.body.password,
+    type:req.body.type,
+  }).then(success => {
+    res.send('success');
   }).catch(err => {
     console.log(err);
     res.status(403).end();

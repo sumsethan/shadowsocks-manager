@@ -41,18 +41,34 @@ exports.signup = (req, res) => {
     });
   }).then(success => {
     if(success[0] > 1) {
-      const userId = success[0];
-      let port = 50000;
-      return knex('webguiSetting').select().where({
-        key: 'system',
-      })
-      .then(success => JSON.parse(success[0].value))
-      .then(success => {
-        const newUserAccount = success.accountForNewUser;
-        if(!success.accountForNewUser.isEnable) {
-          return;
-        }
-        return knex('account_plugin').select().orderBy('port', 'DESC').limit(1)
+      return autoAddAccount(success[0])
+    } else {
+      return true;
+    }
+  }).then(success => {
+    logger.info(`[${ req.body.email }] signup success`);
+    push.pushMessage('注册', {
+      body: `用户[ ${ req.body.email.toString().toLowerCase() } ]注册成功`,
+    });
+    res.send('success');
+  }).catch(err => {
+    logger.error(`[${ req.body.email }] signup fail: ${ err }`);
+    res.status(403).end();
+  });
+};
+
+const autoAddAccount = (userId) => {
+  let port = 50000;
+  return knex('webguiSetting').select().where({
+    key: 'system',
+  })
+    .then(success => JSON.parse(success[0].value))
+    .then(success => {
+      const newUserAccount = success.accountForNewUser;
+      if(!success.accountForNewUser.isEnable) {
+        return;
+      }
+      return knex('account_plugin').select().orderBy('port', 'DESC').limit(1)
         .then(success => {
           if(success.length) {
             port = success[0].port + 1;
@@ -67,21 +83,9 @@ exports.signup = (req, res) => {
             autoRemove: 1,
           });
         });
-      });
-    } else {
-      return;
-    }
-  }).then(success => {
-    logger.info(`[${ req.body.email }] signup success`);
-    push.pushMessage('注册', {
-      body: `用户[ ${ req.body.email.toString().toLowerCase() } ]注册成功`,
     });
-    res.send('success');
-  }).catch(err => {
-    logger.error(`[${ req.body.email }] signup fail: ${ err }`);
-    res.status(403).end();
-  });
 };
+exports.autoAddAccount = autoAddAccount;
 
 exports.login = (req, res) => {
   delete req.session.user;

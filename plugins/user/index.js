@@ -112,29 +112,24 @@ const editUser = async (userInfo, edit) => {
 };
 
 const getUsers = async () => {
-  const users = await knex('user').select().where({
-    type: 'normal',
-  });
+  const users = await knex('user').select();
   return users;
 };
 
 const getRecentSignUpUsers = async (number) => {
   const users = await knex('user').select().where({
-    type: 'normal',
   }).orderBy('createTime', 'desc').limit(number);
   return users;
 };
 
 const getRecentLoginUsers = async (number) => {
   const users = await knex('user').select().where({
-    type: 'normal',
   }).orderBy('lastLogin', 'desc').limit(number);
   return users;
 };
 
 const getOneUser = async (id) => {
   const user = await knex('user').select().where({
-    type: 'normal',
     id,
   });
   if(!user.length) {
@@ -151,8 +146,8 @@ const getUserAndPaging = async (opt = {}) => {
   const page = opt.page || 1;
   const pageSize = opt.pageSize || 20;
 
-  let count = knex('user').select().where({ type: 'normal' });
-  let users = knex('user').select().where({ type: 'normal' });
+  let count = knex('user').select();
+  let users = knex('user').select();
   if(search) {
     count = count.where('username', 'like', `%${ search }%`);
     users = users.where('username', 'like', `%${ search }%`);
