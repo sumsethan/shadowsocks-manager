@@ -86,7 +86,7 @@ exports.getServers = (req, res) => {
     }
     const accountInfo = success[0];
     const server = JSON.parse(accountInfo.server);
-    knex('server').select(['id', 'host', 'name', 'method', 'scale'])
+    knex('server').select(['id', 'host', 'name', 'method', 'scale', 'allot'])
       .orderBy('name').then(success => {
       res.send(success.filter(s => server.indexOf(s.id) >=0));
     }).catch(err => {

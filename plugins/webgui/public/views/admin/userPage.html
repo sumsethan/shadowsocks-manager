@@ -5,11 +5,6 @@
                 <md-card-header-text>
                     <span class="md-headline">{{user.username}}{{user.type === 'admin'?'(管理员)':''}}</span>
                 </md-card-header-text>
-                <div>
-                    <md-button class="md-primary" aria-label="edit" ng-click="editUser(user.id)">
-                        修改
-                    </md-button>
-                </div>
             </md-card-header>
             <md-card-content>
               <md-list>
@@ -35,6 +30,9 @@
               </md-list>
             <div flex layout="row" layout-align="space-between center">
                 <div flex="80"></div>
+                <md-button class="md-primary" aria-label="edit" ng-click="editUser(user.id)">
+                    修改
+                </md-button>
                 <md-button class="md-primary" ng-click="deleteUser()">删除用户</md-button>
             </div>
             </md-card-content>
