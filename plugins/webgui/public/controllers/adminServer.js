@@ -240,6 +240,10 @@ app.controller('AdminServerController', ['$scope', '$http', '$state', 'moment', 
         $scope.sumFlow = success[0].data.reduce((a, b) => {
           return a + b;
         }, 0);
+        $scope.serverFlow = {};
+        success[1].data.forEach(function (flowData) {
+          $scope.serverFlow[flowData.port] = flowData
+        });
         setChart(success[0].data, success[1].data);
       });
       if($scope.flowType === 'hour') {

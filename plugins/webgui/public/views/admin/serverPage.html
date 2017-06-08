@@ -75,6 +75,10 @@
                     <div flex="40">{{port.port}}</div>
                     <div flex="60" style="text-align:right; color: #aaa; font-size: 0.8em;">{{port.password}}</div>
                 </div>
+                <div layout="row" style="font-size: 0.8em;padding-top:5px;" ng-if="serverFlow[port.port]" layout-align="space-between center">
+                    <div flex="40" style="">{{serverFlow[port.port].flow | flow}}</div>
+                    <div flex="60" style="text-align:right; color: #aaa;">{{serverFlow[port.port].username}}</div>
+                </div>
             </md-card-content>
         </md-card>
     </div>
