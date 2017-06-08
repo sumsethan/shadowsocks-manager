@@ -138,7 +138,7 @@ const checkServer = async () => {
         account.forEach(async a => {
           const accountServer = a.server ? JSON.parse(a.server) : a.server;
           if(accountServer) {
-            newAccountServer = accountServer.filter(f => {
+            let newAccountServer = accountServer.filter(f => {
               return server.filter(sf => sf.id === f)[0];
             });
             if(JSON.stringify(newAccountServer) !== JSON.stringify(accountServer)) {

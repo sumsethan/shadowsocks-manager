@@ -16,6 +16,7 @@ const createTable = async () => {
     table.integer('port');
     table.string('password');
     table.float('scale').defaultTo(1);
+    table.integer('allot').defaultTo(0);
     table.string('method').defaultTo('aes-256-cfb');
   });
   const hasColumnScale = await knex.schema.hasColumn(tableName, 'scale');
@@ -24,6 +25,14 @@ const createTable = async () => {
       table.float('scale').defaultTo(1);
     });
   }
+  knex.schema.hasColumn(tableName, 'allot')
+    .then((exists) => {
+      if(!exists){
+        return knex.schema.table(tableName, function (table) {
+          table.integer('allot').defaultTo(0);
+        })
+      }
+    });
   const list = await knex('server').select(['name', 'host', 'port', 'password']);
   if(list.length === 0) {
     const host = config.manager.address.split(':')[0];
@@ -47,6 +56,7 @@ const createTable = async () => {
       host,
       port,
       password,
+      allot: 1,
     });
   }
   return;

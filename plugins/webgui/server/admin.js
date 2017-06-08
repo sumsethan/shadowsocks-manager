@@ -70,7 +70,8 @@ exports.addServer = (req, res) => {
     const port = +req.body.port;
     const password = req.body.password;
     const method = req.body.method;
-    return serverManager.add(name, address, port, password, method);
+    const allot = req.body.allot;
+    return serverManager.add(name, address, port, password, method, allot);
   }).then(success => {
     res.send('success');
   }).catch(err => {
@@ -109,7 +110,8 @@ exports.editServer = (req, res) => {
     const password = req.body.password;
     const method = req.body.method;
     const scale = req.body.scale;
-    return serverManager.edit(serverId, name, address, port, password, method, scale);
+    const allot = req.body.allot;
+    return serverManager.edit(serverId, name, address, port, password, method, scale, allot);
   }).then(success => {
     res.send('success');
   }).catch(err => {

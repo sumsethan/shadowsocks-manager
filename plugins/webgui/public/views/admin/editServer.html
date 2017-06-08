@@ -56,6 +56,13 @@
                         <div ng-message="required">流量比例不能为空</div>
                     </div>
                 </md-input-container>
+                <div style="width: 100%;" layout="row" layout-align="space-between center">
+                    <div flex="75">是否自动分配至账号</div>
+                    <div flex layout="row" layout-align="end center">
+                        <md-switch ng-model="server.allot" aria-label="allot">
+                        </md-switch>
+                    </div>
+                </div>
             </form>
         </div>
         <div flex="10" flex-gt-sm="30"></div>

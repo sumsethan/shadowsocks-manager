@@ -108,7 +108,13 @@ app.controller('AdminAccountController', ['$scope', '$state', '$stateParams', '$
       $http.get('/api/admin/setting'),
     ]).then(success => {
       $scope.account = success[0].data;
-      $scope.servers = success[1].data.map(server => {
+      $scope.servers = success[1].data.filter((s) => {
+        if($scope.account.server){
+          return $scope.account.server.indexOf(s.id)>=0
+        }else{
+          return true;
+        }
+      }).map(server => {
         if(server.host.indexOf(':') >= 0) {
           server.host = server.host.split(':')[1];
         }
@@ -340,11 +346,30 @@ app.controller('AdminAccountController', ['$scope', '$state', '$stateParams', '$
       flow: 100,
       autoRemove: 0,
     };
+    $http.get('/api/admin/server').then(success => {
+      $scope.servers = success.data;
+      $scope.accountServerObj = {};
+      $scope.servers.forEach(server => {
+        if(server.allot) {
+          $scope.accountServerObj[server.id] = true;
+        } else {
+          $scope.accountServerObj[server.id] = false;
+        }
+      });
+      $scope.accountServer=true;
+    });
     $scope.cancel = () => {
       $state.go('admin.account');
     };
     $scope.confirm = () => {
       alertDialog.loading();
+      const server = Object.keys($scope.accountServerObj)
+        .map(m => {
+          if($scope.accountServerObj[m]) {
+            return +m;
+          }
+        })
+        .filter(f => f);
       $http.post('/api/admin/account', {
         type: +$scope.account.type,
         port: +$scope.account.port,
@@ -353,6 +378,7 @@ app.controller('AdminAccountController', ['$scope', '$state', '$stateParams', '$
         limit: +$scope.account.limit,
         flow: +$scope.account.flow * 1000 * 1000,
         autoRemove: $scope.account.autoRemove ? 1 : 0,
+        server: $scope.accountServer ? server : null,
       }).then(success => {
         alertDialog.show('添加账号成功', '确定');
         $state.go('admin.account');
