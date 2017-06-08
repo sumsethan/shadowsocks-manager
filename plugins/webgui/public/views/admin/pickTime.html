@@ -48,7 +48,7 @@
             <div flex layout="row" layout-align="space-between center">
                 <div flex="40">时长：</div>
                 <div flex="60" style="text-align:right">
-                    <span>{{ account.limit }}</span>
+                    <input style="border:0;background: none;text-align: right;outline:none;" type="number" required name="limit" ng-model="account.limit">
                 </div>
             </div>
         </md-list-item>
