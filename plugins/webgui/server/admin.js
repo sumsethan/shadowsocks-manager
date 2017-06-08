@@ -606,11 +606,12 @@ exports.addUser = (req, res) => {
     if(result.isEmpty()) {
       const email = req.body.email;
       const password = req.body.password;
+      const type = req.body.type;
       return user.add({
         username: email,
         email,
         password,
-        type: 'normal',
+        type: type,
       });
     }
     result.throw();
@@ -633,7 +634,9 @@ exports.addUser = (req, res) => {
 
 exports.changeUserData = (req, res) => {
   const userId = req.params.userId;
-  user.edit(userId, {
+  user.edit({
+    id:userId,
+  }, {
     password: req.body.password,
     type:req.body.type,
   }).then(success => {

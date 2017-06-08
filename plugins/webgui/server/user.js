@@ -72,16 +72,32 @@ exports.getOneAccount = (req, res) => {
   }).catch(err => {
     console.log(err);
     res.status(500).end();
-  });;
+  });
 };
 
 exports.getServers = (req, res) => {
-  knex('server').select(['id', 'host', 'name', 'method', 'scale']).orderBy('name').then(success => {
-    res.send(success);
+  const userId = req.session.user;
+  account.getAccount({
+    userId,
+  }).then((success) => {
+    if(!success.length) {
+      res.send({});
+      return;
+    }
+    const accountInfo = success[0];
+    const server = JSON.parse(accountInfo.server);
+    knex('server').select(['id', 'host', 'name', 'method', 'scale'])
+      .orderBy('name').then(success => {
+      res.send(success.filter(s => server.indexOf(s.id) >=0));
+    }).catch(err => {
+      console.log(err);
+      res.status(500).end();
+    });
   }).catch(err => {
     console.log(err);
     res.status(500).end();
-  });
+  });;
+
 };
 
 exports.getServerPortFlow = (req, res) => {

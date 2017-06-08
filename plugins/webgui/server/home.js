@@ -171,25 +171,25 @@ exports.sendResetPasswordEmail = (req, res) => {
       return Promise.reject('user not exists');
     }
     return users[0];
-  }).then(user => {
-    if(user.resetPasswordTime + 600 * 1000 >= Date.now()) {
+  }).then(userData => {
+    if(userData.resetPasswordTime + 600 * 1000 >= Date.now()) {
       return Promise.reject('already send');
     }
     token = crypto.randomBytes(16).toString('hex');
     const ip = req.headers['x-real-ip'] || req.connection.remoteAddress;
     const session = req.sessionID;
     const address = config.plugins.webgui.site + '/home/password/reset/' + token;
-    return emailPlugin.sendMail(email, 'ss密码重置', '请访问下列地址重置您的密码：\n' + address, {
-      ip,
-      session,
-    });
-  }).then(success => {
     return user.edit({
       username: email,
     }, {
       resetPasswordId: token,
       resetPasswordTime: Date.now(),
-    });
+    }).then(function () {
+      return emailPlugin.sendMail(email, 'ss密码重置', '请访问下列地址重置您的密码：\n' + address, {
+        ip,
+        session,
+      });
+    })
   }).then(success => {
     res.send('success');
   }).catch(err => {
